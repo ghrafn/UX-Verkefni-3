@@ -31,8 +31,7 @@
     <script src="https://unpkg.com/three@0.126.0/examples/js/loaders/GLTFLoader.js"></script>
 
     <!-- AFrame -->
-    <script
-        src="https://cdn.jsdelivr.net/gh/aframevr/aframe@e63859e4ce1087a1c350958469dda59cdfc79f43/dist/aframe-master.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/aframevr/aframe@e63859e4ce1087a1c350958469dda59cdfc79f43/dist/aframe-master.min.js"></script>
 </head>
 
 <body>
@@ -69,11 +68,6 @@
             // Initialize a WebXR session using "immersive-ar".
             const session = await navigator.xr.requestSession("immersive-ar", {
                 requiredFeatures: ['hit-test'],
-                requiredFeatures: ["depth-sensing"],
-                depthSensing: {
-                    usagePreference: ["cpu-optimized", "gpu-optimized"],
-                    formatPreference: ["luminance-alpha", "float32"]
-                }
             });
             session.updateRenderState({
                 baseLayer: new XRWebGLLayer(session, gl)
@@ -90,6 +84,7 @@
                 // Retrieve the pose of the device.
                 const pose = frame.getViewerPose(referenceSpace);
                 if (pose) {
+                    // In mobile AR, we only have one view.
                     const view = pose.views[0];
 
                     const viewport = session.renderState.baseLayer.getViewport(view);
@@ -107,28 +102,10 @@
                         reticle.position.set(hitPose.transform.position.x, hitPose.transform.position.y, hitPose.transform.position.z)
                         reticle.updateMatrixWorld(true);
                     }
-                    // Retrieve and use the depth data within the XRFrame loop.
-                    const depthInfo = frame.getDepthInformation(view);
 
-                    if (depthInfo) {
-                        const depthValues = new Float32Array(depthInfo.data);
-
-                        // Process depth data as needed, for example:
-                        // Adjust scene elements based on depth information.
-                        for (let i = 0; i < depthValues.length; i++) {
-                            const depthValue = depthValues[i];
-                            // Use depth data for scene interaction or adjustments.
-                            // For instance, change object visibility based on depth.
-                            if (depthValue < 3.0) {
-                                flower.visible = true;
-                            } else {
-                                flower.visible = false;
-                            }
-                        }
-                    }
 
                     // Render the scene with THREE.WebGLRenderer.
-                    renderer.render(scene, camera);
+                    renderer.render(scene, camera)
                 }
             }
             session.requestAnimationFrame(onXRFrame);
@@ -139,4 +116,4 @@
     </script>
 </body>
 
-</html>
+</html>"
