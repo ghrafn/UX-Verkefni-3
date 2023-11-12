@@ -2,28 +2,62 @@
 <html lang="en">
 
 <head>
-	<title>Basic Scene with WebXR</title>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-	<link type="text/css" rel="stylesheet" href="style.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r126/three.js" crossorigin="anonymous"></script>
+    <title>Basic Scene</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <style>
+        body {
+            margin: 0;
+            background-color: #000;
+            color: #fff;
+            font-family: Monospace;
+            font-size: 16px;
+            line-height: 24px;
+            overscroll-behavior: none;
+        }
+
+        a {
+            color: #ff0;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        button {
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        a, button, input, select {
+            pointer-events: auto;
+        }
+    </style>
+
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r126/three.js" crossorigin="anonymous"></script>
 </head>
 
 <body>
-	<script type="module">
-    // To start an AR scene with webXR, we can use a handy button provided by three.js
-    // We first have to import it because it is a javascript module
-    import { ARButton } from 'https://unpkg.com/three@0.126.0/examples/jsm/webxr/ARButton.js';
-    
-		let camera, scene, renderer;
-    let mesh;
+    <script type="module">
+        // To start an AR scene with webXR, we can use a handy button provided by three.js
+        // We first have to import it because it is a javascript module
+        import { ARButton } from 'https://unpkg.com/three@0.126.0/examples/jsm/webxr/ARButton.js';
 
-		init();
-		animate();
+        let camera, scene, renderer;
+        let mesh;
 
-		function init() {
-			const container = document.createElement('div');
-			document.body.appendChild(container);
+        init();
+        animate();
+
+        function init() {
+            const container = document.createElement('div');
+            document.body.appendChild(container);
 
 			scene = new THREE.Scene();
 
