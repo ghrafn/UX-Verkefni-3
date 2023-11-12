@@ -16,8 +16,12 @@
     <!-- Three.js -->
     <script src="https://unpkg.com/three@0.126.0/build/three.js"></script>
 
+    <!-- GLTF loader -->
     <script src="https://unpkg.com/three@0.126.0/examples/js/loaders/GLTFLoader.js"></script>
 
+    <!-- AFrame -->
+    <script
+        src="https://cdn.jsdelivr.net/gh/aframevr/aframe@e63859e4ce1087a1c350958469dda59cdfc79f43/dist/aframe-master.min.js"></script>
 </head>
 
 <body>
@@ -33,7 +37,7 @@
             const scene = new THREE.Scene();
 
             const directionalLight = new THREE.DirectionalLight(0xffffff, 0.3);
-            directionalLight.position.set(10, 15, 10);
+            directionalLight.position.set(0, 1, 0);
             scene.add(directionalLight);
 
 
@@ -52,7 +56,14 @@
             camera.matrixAutoUpdate = false;
 
             // Initialize a WebXR session using "immersive-ar".
-            const session = await navigator.xr.requestSession("immersive-ar", { requiredFeatures: ['hit-test'] });
+            const session = await navigator.xr.requestSession("immersive-ar", {
+                requiredFeatures: ['hit-test'],
+                requiredFeatures: ["depth-sensing"],
+                depthSensing: {
+                    usagePreference: ["cpu-optimized", "gpu-optimized"],
+                    formatPreference: ["luminance-alpha", "float32"]
+                }
+            });
             session.updateRenderState({
                 baseLayer: new XRWebGLLayer(session, gl)
             });
