@@ -11,17 +11,6 @@
             cursor: pointer;
             text-transform: uppercase;
         }
-
-        canvas {
-            display: block;
-        }
-
-        a,
-        button,
-        input,
-        select {
-            pointer-events: auto;
-        }
     </style>
 
     <!-- Three.js -->
@@ -94,15 +83,6 @@
                     camera.matrix.fromArray(view.transform.matrix)
                     camera.projectionMatrix.fromArray(view.projectionMatrix);
                     camera.updateMatrixWorld(true);
-
-                    const hitTestResults = frame.getHitTestResults(hitTestSource);
-                    if (hitTestResults.length > 0 && reticle) {
-                        const hitPose = hitTestResults[0].getPose(referenceSpace);
-                        reticle.visible = true;
-                        reticle.position.set(hitPose.transform.position.x, hitPose.transform.position.y, hitPose.transform.position.z)
-                        reticle.updateMatrixWorld(true);
-                    }
-
 
                     // Render the scene with THREE.WebGLRenderer.
                     renderer.render(scene, camera)
