@@ -1,101 +1,80 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 
 <head>
-    <meta charset='utf-8'>
-    <meta name='viewport' content='width=device-width, initial-scale=1, user-scalable=no'>
-    <meta name='mobile-web-app-capable' content='yes'>
-    <meta name='apple-mobile-web-app-capable' content='yes'>
-    <title>Hello WebXR!</title>
-
-    <!-- three.jssss -->
-    <script src="three.js"></script>
+	<title>Basic Scene with WebXR</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+	<link type="text/css" rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r126/three.js" crossorigin="anonymous"></script>
 </head>
 
 <body>
+	<script type="module">
+    // To start an AR scene with webXR, we can use a handy button provided by three.js
+    // We first have to import it because it is a javascript module
+    import { ARButton } from 'https://unpkg.com/three@0.126.0/examples/jsm/webxr/ARButton.js';
+    
+		let camera, scene, renderer;
+    let mesh;
 
-    <!-- Starting an immersive WebXR session requires user interaction.
-    We start this one with a simple button. -->
-    <button onclick="activateXR()">Start Hello WebXR</button>
-    <script>
-        async function activateXR() {
-            // Add a canvas element and initialize a WebGL context that is compatible with WebXR.
-            const canvas = document.createElement("canvas");
-            document.body.appendChild(canvas);
-            const gl = canvas.getContext("webgl", { xrCompatible: true });
+		init();
+		animate();
 
-            const scene = new THREE.Scene();
-            // The cube will have a different color on each side.
-            const materials = [
-                new THREE.MeshBasicMaterial({ color: 0xff0000 }),
-                new THREE.MeshBasicMaterial({ color: 0x0000ff }),
-                new THREE.MeshBasicMaterial({ color: 0x00ff00 }),
-                new THREE.MeshBasicMaterial({ color: 0xff00ff }),
-                new THREE.MeshBasicMaterial({ color: 0x00ffff }),
-                new THREE.MeshBasicMaterial({ color: 0xffff00 })
-            ];
+		function init() {
+			const container = document.createElement('div');
+			document.body.appendChild(container);
 
-            // Create the cube and add it to the demo scene.
-            const cube = new THREE.Mesh(new THREE.BoxBufferGeometry(0.2, 0.2, 0.2), materials);
-            cube.position.set(1, 1, 1);
-            scene.add(cube);
-            // renderer.render(scene, camera);
+			scene = new THREE.Scene();
 
-            // Set up the WebGLRenderer, which handles rendering to the session's base layer.
-            const renderer = new THREE.WebGLRenderer({
-                alpha: true,
-                preserveDrawingBuffer: true,
-                canvas: canvas,
-                context: gl
-            });
-            renderer.autoClear = false;
+			camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 40);
 
-            // The API directly updates the camera matrices.
-            // Disable matrix auto updates so three.js doesn't attempt
-            // to handle the matrices independently.
-            const camera = new THREE.PerspectiveCamera();
-            camera.matrixAutoUpdate = false;
+			renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+			renderer.setPixelRatio(window.devicePixelRatio);
+			renderer.setSize(window.innerWidth, window.innerHeight);
+      // This next line is important to to enable the renderer for WebXR
+			renderer.xr.enabled = true; // New!
+			container.appendChild(renderer.domElement);
 
-            // Initialize a WebXR session using "immersive-ar".
-            const session = await navigator.xr.requestSession("immersive-ar");
-            session.updateRenderState({
-                baseLayer: new XRWebGLLayer(session, gl)
-            });
+			var light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
+			light.position.set(0.5, 1, 0.25);
+			scene.add(light);
 
-            // A 'local' reference space has a native origin that is located
-            // near the viewer's position at the time the session was created.
-            const referenceSpace = await session.requestReferenceSpace('local');
+      const geometry = new THREE.IcosahedronGeometry(0.1, 1);
+      const material = new THREE.MeshPhongMaterial({
+        color      :  new THREE.Color("rgb(226,35,213)"),
+        shininess  :  6,
+        flatShading:  true,
+        transparent: 1,
+        opacity    : 0.8
+      });
+      
+      mesh = new THREE.Mesh(geometry, material);
+      mesh.position.set(0, 0, -0.5);
+      scene.add(mesh);
 
-            // Create a render loop that allows us to draw on the AR view.
-            const onXRFrame = (time, frame) => {
-                // Queue up the next draw request.
-                session.requestAnimationFrame(onXRFrame);
+			// Add the AR button to the body of the DOM
+			document.body.appendChild(ARButton.createButton(renderer));
 
-                // Bind the graphics framebuffer to the baseLayer's framebuffer
-                gl.bindFramebuffer(gl.FRAMEBUFFER, session.renderState.baseLayer.framebuffer)
+			window.addEventListener('resize', onWindowResize, false);
+		}
 
-                // Retrieve the pose of the device.
-                // XRFrame.getViewerPose can return null while the session attempts to establish tracking.
-                const pose = frame.getViewerPose(referenceSpace);
-                if (pose) {
-                    // In mobile AR, we only have one view.
-                    const view = pose.views[0];
+		function onWindowResize() {
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
 
-                    const viewport = session.renderState.baseLayer.getViewport(view);
-                    renderer.setSize(viewport.width, viewport.height)
+			renderer.setSize(window.innerWidth, window.innerHeight);
+		}
 
-                    // Use the view's transform matrix and projection matrix to configure the THREE.camera.
-                    camera.matrix.fromArray(view.transform.matrix)
-                    camera.projectionMatrix.fromArray(view.projectionMatrix);
-                    camera.updateMatrixWorld(true);
+		function animate() {
+			renderer.setAnimationLoop(render);
+		}
 
-                    // Render the scene with THREE.WebGLRenderer.
-                    renderer.render(scene, camera)
-                }
-            }
-            session.requestAnimationFrame(onXRFrame);
-        }
-    </script>
+		function render() {      
+			renderer.render(scene, camera);
+		}
+
+	</script>
 </body>
 
 </html>
