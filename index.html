@@ -104,14 +104,9 @@
                 // Queue up the next draw request.
                 session.requestAnimationFrame(onXRFrame);
 
-                // Bind the graphics framebuffer to the baseLayer's framebuffer
-                gl.bindFramebuffer(gl.FRAMEBUFFER, session.renderState.baseLayer.framebuffer)
-
                 // Retrieve the pose of the device.
-                // XRFrame.getViewerPose can return null while the session attempts to establish tracking.
                 const pose = frame.getViewerPose(referenceSpace);
                 if (pose) {
-                    // In mobile AR, we only have one view.
                     const view = pose.views[0];
 
                     const viewport = session.renderState.baseLayer.getViewport(view);
@@ -129,10 +124,28 @@
                         reticle.position.set(hitPose.transform.position.x, hitPose.transform.position.y, hitPose.transform.position.z)
                         reticle.updateMatrixWorld(true);
                     }
+                    // Retrieve and use the depth data within the XRFrame loop.
+                    const depthInfo = frame.getDepthInformation(view);
 
+                    if (depthInfo) {
+                        const depthValues = new Float32Array(depthInfo.data);
+
+                        // Process depth data as needed, for example:
+                        // Adjust scene elements based on depth information.
+                        for (let i = 0; i < depthValues.length; i++) {
+                            const depthValue = depthValues[i];
+                            // Use depth data for scene interaction or adjustments.
+                            // For instance, change object visibility based on depth.
+                            if (depthValue < 3.0) {
+                                flower.visible = true;
+                            } else {
+                                flower.visible = false;
+                            }
+                        }
+                    }
 
                     // Render the scene with THREE.WebGLRenderer.
-                    renderer.render(scene, camera)
+                    renderer.render(scene, camera);
                 }
             }
             session.requestAnimationFrame(onXRFrame);
