@@ -73,7 +73,7 @@
             const referenceSpace = await session.requestReferenceSpace('local');
 
             // Rotate cube on touch 
-            const touchStart = new THREE.Vector2();
+            /*const touchStart = new THREE.Vector2();
             const touchEnd = new THREE.Vector2();
             canvas.addEventListener('touchstart', (touchstarting) => {
                 touchStart.x = touchstarting.touches[0].clientX;
@@ -88,7 +88,7 @@
                 touchStart.y = 0;
                 touchEnd.x = 0;
                 touchEnd.y = 0;
-            }, false);
+            }, false); */
 
 
             // Create a render loop that allows us to draw on the AR view.
@@ -96,10 +96,10 @@
                 // Queue up the next draw request.
                 session.requestAnimationFrame(onXRFrame);
                 // Rotate cube by touch
-                if (touchmoving.touches.length === 1) {
+                /*if (touchmoving.touches.length === 1) {
                     cube.rotation.y += touchEnd.y - touchStart.y * 0.01;
                     cube.rotation.x += touchEnd.x - touchStart.x * 0.01;
-                }
+                }*/
                 // Bind the graphics framebuffer to the baseLayer's framebuffer
                 gl.bindFramebuffer(gl.FRAMEBUFFER, session.renderState.baseLayer.framebuffer)
 
